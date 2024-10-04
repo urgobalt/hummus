@@ -1,10 +1,20 @@
-pub use snafu::{ErrorCompat, ResultExt};
+#![feature(let_chains)]
 
+use clap::Parser;
+use directories::ProjectDirs;
+use snafu::{ErrorCompat, ResultExt};
+
+mod command_arguments;
 mod error;
+mod log;
 mod rust_backtrace;
 
+pub use command_arguments::Args;
 use error::MainError;
 use rust_backtrace::RustBacktrace;
+
+const QUALIFIER: &str = "";
+const ORGANISATION: &str = "";
 
 #[tokio::main]
 async fn main() {
@@ -19,5 +29,8 @@ async fn main() {
 }
 
 async fn _main() -> Result<(), MainError> {
-    Err(MainError::ArgumentError)
+    let args = Args::parse();
+    let project_dirs = ProjectDirs::from(QUALIFIER, ORGANISATION, clap::crate_name!());
+    let _guard = log::init(args, project_dirs);
+    Ok(())
 }
