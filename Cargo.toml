@@ -1,9 +1,10 @@
 [package]
-name = "hmcs"
+name = "hummus"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 clap = { version = "4.5.19", features = ["derive", "cargo", "env"] }
+serde = { version = "1.0.210", features = ["derive", "serde_derive"] }
 snafu = { version = "0.8.5", features = ["backtrace", "backtraces-impl-backtrace-crate", "futures"] }
 tokio = { version = "1.40.0", features = ["full"] }
