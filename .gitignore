@@ -1,0 +1,8 @@
+/.direnv
+
+**/node_modules
+**/target
+**/dist
+
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
