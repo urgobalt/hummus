@@ -47,7 +47,7 @@
           ];
 
           shellHook = ''
-            PATH="$(pwd)/huui/node_modules/.bin:$PATH"
+            PATH="$(pwd)/ui/node_modules/.bin:$PATH"
           '';
         };
     });

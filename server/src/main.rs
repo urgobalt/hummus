@@ -11,8 +11,8 @@ struct AppState {}
 async fn main() {
     let state = AppState {};
     let router = Router::new()
-        .route_service("/", ServeFile::new("../huui/dist/index.html"))
-        .nest_service("/assets", ServeDir::new("../huui/dist/assets"))
+        .route_service("/", ServeFile::new("../ui/dist/index.html"))
+        .nest_service("/assets", ServeDir::new("../ui/dist/assets"))
         .with_state(state);
 
     let mut listenfd = ListenFd::from_env();

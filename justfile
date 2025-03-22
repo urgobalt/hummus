@@ -4,44 +4,51 @@ set shell := ["bash", "-c"]
 default:
   just --list
 
-# Build huui; the main website component
-[working-directory: 'huui']
-build-huui:
+# Build the ui
+[working-directory: 'ui']
+build-ui:
   pnpm vite build
 
-# Build huttp; the webserver and huui
-[working-directory: 'huttp']
-build-huttp: build-huui
+# Build the server and ui
+[working-directory: 'server']
+build-server: build-ui
   cargo build -q
 
-[working-directory: 'hulp']
-build-tauri:
+[working-directory: 'app']
+build-app:
   cargo tauri build
 
-# Start huttp (the webserver) after building the frontend component (huui)
-[working-directory: 'huttp']
-serve-huttp: build-huui
+# Start the webserver after building the ui
+[working-directory: 'server']
+serve: build-ui
   cargo run -q
 
-# Start huttp (the webserver) after building the frontend component (huui) and watch for changes
+# Start the webserver after building the ui and watch for changes
 watch-serve:
   systemfd --no-pid -s http::3000 -- \
   watchexec \
     --wrap-process none \
-    -w huui \
-    -w huttp \
+    -w ui \
+    -w server \
     -e html,css,js,rs -r \
-    just serve-huttp
+    just serve
 
-# Start huttp (the webserver) after building the frontend component (huui) and watch for changes
+# Start the app after building the ui and watch for changes
 [working-directory: 'hulp']
 watch-tauri:
-  cargo tauri dev &
-  just watch-serve
+  watchexec \
+    --wrap-process none \
+    -w ui \
+    -e html,css,js -r \
+    just build-ui &
+  cargo tauri dev
 
 # Clean caches, outputs and more from the projects
 clean:
-  rm huui/dist -rd &2>/dev/null
-  rm huui/node_modules/.vite* -rd &2>/dev/null
-  cd huttp && cargo clean &2>/dev/null
-  cd hulp && cargo clean &2>/dev/null
+  rm ui/dist -rd &2>/dev/null
+  rm ui/node_modules/.vite* -rd &2>/dev/null
+  rm server/target* -rd &2>/dev/null
+  rm app/target* -rd &2>/dev/null
+  cd server && cargo clean &2>/dev/null
+  cd app && cargo clean &2>/dev/null
+  cargo clean &2>/dev/null

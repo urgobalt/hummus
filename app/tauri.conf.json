@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.hummus.io",
   "build": {
-    "frontendDist": "huui/dist",
+    "frontendDist": "ui/dist",
     "devUrl": "http://localhost:3000"
   },
   "app": {
