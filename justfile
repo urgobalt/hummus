@@ -29,6 +29,7 @@ watch-serve:
   watchexec \
     --wrap-process none \
     -w ui \
+    -w api \
     -w server \
     -e html,css,js,rs -r \
     just serve

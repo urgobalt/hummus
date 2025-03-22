@@ -11,9 +11,10 @@ struct AppState {}
 async fn main() {
     let state = AppState {};
     let router = Router::new()
+        .with_state(state)
+        .nest("/api", api::router())
         .route_service("/", ServeFile::new("../ui/dist/index.html"))
-        .nest_service("/assets", ServeDir::new("../ui/dist/assets"))
-        .with_state(state);
+        .nest_service("/assets", ServeDir::new("../ui/dist/assets"));
 
     let mut listenfd = ListenFd::from_env();
     let listener = match listenfd.take_tcp_listener(0).unwrap() {
