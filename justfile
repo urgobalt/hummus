@@ -12,7 +12,7 @@ build-huui:
 # Build huttp; the webserver and huui
 [working-directory: 'huttp']
 build-huttp: build-huui
-  cargo build
+  cargo build -q
 
 [working-directory: 'hulp']
 build-tauri:
@@ -21,7 +21,7 @@ build-tauri:
 # Start huttp (the webserver) after building the frontend component (huui)
 [working-directory: 'huttp']
 serve-huttp: build-huui
-  cargo run
+  cargo run -q
 
 # Start huttp (the webserver) after building the frontend component (huui) and watch for changes
 watch-serve:
