@@ -47,6 +47,9 @@
           ];
 
           shellHook = ''
+            if ! [[ -d ./ui/node_modules ]]; then
+              $(cd ui && pnpm install)
+            fi
             PATH="$(pwd)/ui/node_modules/.bin:$PATH"
           '';
         };
