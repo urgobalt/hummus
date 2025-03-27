@@ -21,7 +21,10 @@
     ">
     tree
   </aside>
-  <main></main>
+  <main>
+    <div x-data="{content: ''}" x-model="content" x-on:change="console.log(content)" contenteditable="true">
+    </div>
+  </main>
   <script type="module" src="/src/main.ts"></script>
   <div class="hidden" x-cloak>
     Modal

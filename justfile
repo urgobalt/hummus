@@ -7,7 +7,7 @@ default:
 # Build the ui
 [working-directory: 'ui']
 build-ui:
-  pnpm vite build
+  rsbuild build -w
 
 # Build the server and ui
 [working-directory: 'server']
@@ -20,18 +20,18 @@ build-app:
 
 # Start the webserver after building the ui
 [working-directory: 'server']
-serve: build-ui
+serve:
   cargo run -q
 
 # Start the webserver after building the ui and watch for changes
 watch-serve:
+  just build-ui &
   systemfd --no-pid -s http::3000 -- \
   watchexec \
     --wrap-process none \
-    -w ui \
     -w api \
     -w server \
-    -e html,css,js,rs -r \
+    -e rs -r \
     just serve
 
 # Start the app after building the ui and watch for changes

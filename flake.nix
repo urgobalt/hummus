@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
   outputs = {
@@ -21,14 +21,13 @@
             just
             watchexec
             systemfd
-            parallel
+            cargo
+            nodejs
           ];
 
           nativeBuildInputs = with pkgs; [
             pkg-config
             gobject-introspection
-            cargo
-            nodejs
           ];
 
           buildInputs = with pkgs; [
