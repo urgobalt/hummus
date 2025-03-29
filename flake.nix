@@ -23,6 +23,7 @@
             systemfd
             cargo
             nodejs
+            parallel
           ];
 
           nativeBuildInputs = with pkgs; [
