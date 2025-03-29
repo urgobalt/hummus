@@ -35,13 +35,13 @@ watch-ui: prepare-ui
 dev-ui: prepare-ui
   $NODE_PACKAGE_MANAGER rsbuild dev -w
 
-# Build the application
+# Build the native tauri application
 [group("app")]
 [working-directory: 'app']
 build-app: build-ui
   cargo tauri build
 
-# Start the app after building the ui and watch for changes
+# Start the native tauri application after building the ui and watch for changes
 [group("app")]
 [working-directory: 'app']
 watch-app:
