@@ -6,6 +6,10 @@ export default defineConfig({
       index: "./src/main.ts",
     },
   },
+  server: {
+    port: parseInt(process.env.PORT ?? "3000"),
+    host: process.env.HOST ?? "localhost",
+  },
   output: {
     cleanDistPath: true,
     distPath: {
