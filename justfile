@@ -81,8 +81,6 @@ clean:
   rm ui/node_modules/@rsbuild* -rvd 2>/dev/null
   rm ui/node_modules/@rspack* -rvd 2>/dev/null
   cargo clean 2>/dev/null
-  cd server && cargo clean -v 2>/dev/null
-  cd app && cargo clean -v 2>/dev/null
 
 # Deploys development of all parts of the application and watches for changes
 [group("global")]
