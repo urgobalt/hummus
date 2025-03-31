@@ -42,7 +42,7 @@ dev-ui: prepare-ui
 [group("app")]
 [working-directory: 'app']
 build-app: build-ui
-  cargo tauri build
+  cargo build --release
 
 # Start the native tauri application after building the ui and watch for changes
 [group("app")]
@@ -56,7 +56,7 @@ watch-app:
 [group("web")]
 [working-directory: 'server']
 build-server: build-ui
-  cargo build -q
+  cargo build --release
 
 # Start the webserver and watch for changes
 [private]
