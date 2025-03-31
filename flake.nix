@@ -21,7 +21,6 @@
             just
             watchexec
             systemfd
-            cargo
             nodejs
             parallel
           ];

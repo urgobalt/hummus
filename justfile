@@ -12,7 +12,10 @@ default:
 [group("ui")]
 [working-directory: 'ui']
 prepare-ui:
-  if ! [[ -d node_modules ]]; then; $NODE_PACKAGE_MANAGER install; fi
+  #!/usr/bin/env -S bash
+  if ! [[ -d node_modules ]]; then
+    $NODE_PACKAGE_MANAGER install
+  fi
 
 # Build the ui
 [private]
@@ -78,8 +81,6 @@ watch-server:
 clean:
   #!/usr/bin/env -S bash -- parallel --shebang --ungroup
   rm ui/dist -rvd 2>/dev/null
-  rm ui/node_modules/@rsbuild* -rvd 2>/dev/null
-  rm ui/node_modules/@rspack* -rvd 2>/dev/null
   cargo clean 2>/dev/null
 
 # Deploys development of all parts of the application and watches for changes
