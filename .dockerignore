@@ -1,0 +1,16 @@
+.direnv
+.jj
+/app
+
+flake.nix
+flake.lock
+
+.env
+.envrc
+.prettierrc.json
+.editorconfig
+.gitignore
+
+**/node_modules
+/target
+**/target
