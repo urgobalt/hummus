@@ -1,9 +1,9 @@
 .direnv
 .jj
-/app
 
 flake.nix
 flake.lock
+rust-toolchain.toml
 
 .env
 .envrc
