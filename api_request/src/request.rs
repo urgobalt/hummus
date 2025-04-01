@@ -1,7 +1,32 @@
 use crate::error::Error;
+use reqwest::header::HeaderMap;
 use reqwest::{Method, StatusCode};
 use serde::{Serialize, de::DeserializeOwned};
-
+pub struct Metadata {
+    headers: HeaderMap,
+    status: StatusCode,
+}
+impl Metadata {
+    fn new(headers: HeaderMap, status: StatusCode) -> Self {
+        Self { headers, status }
+    }
+}
+impl From<(&HeaderMap, StatusCode)> for Metadata {
+    fn from((headers, status): (&HeaderMap, StatusCode)) -> Self {
+        Self {
+            headers: headers.clone(),
+            status,
+        }
+    }
+}
+impl From<(StatusCode, &HeaderMap)> for Metadata {
+    fn from((status, headers): (StatusCode, &HeaderMap)) -> Self {
+        Self {
+            status,
+            headers: headers.clone(),
+        }
+    }
+}
 pub const JSON_CONTENT_TYPE: &str = "application/json";
 mod native;
 mod wasm;
@@ -23,37 +48,37 @@ pub trait RequestBackend {
     #[cfg(not(feature = "tauri"))]
     const DEFAULT: Native = Native;
     async fn do_json_json_request<T: Serialize, R: DeserializeOwned>(
-        url: &'static str,
+        url: &str,
         method: Method,
         body: &T,
         base_url: &str,
         cookie: &str,
-    ) -> Result<(StatusCode, R), Error>;
+    ) -> Result<(Metadata, R), Error>;
     async fn do_string_json_request<const JSON: bool, R: DeserializeOwned>(
-        url: &'static str,
+        url: &str,
         method: Method,
         body: String,
         base_url: &str,
         cookie: &str,
-    ) -> Result<(StatusCode, R), Error>;
+    ) -> Result<(Metadata, R), Error>;
     async fn do_status_request(
-        url: &'static str,
+        url: &str,
         method: Method,
         base_url: &str,
         cookie: &str,
-    ) -> Result<StatusCode, Error>;
-    async fn do_string_string_request<const JSON:bool>(
-        url: &'static str,
+    ) -> Result<Metadata, Error>;
+    async fn do_string_string_request<const JSON: bool>(
+        url: &str,
         method: Method,
         body: String,
         base_url: &str,
         cookie: &str,
-    ) -> Result<(StatusCode, String), Error>;
+    ) -> Result<(Metadata, String), Error>;
     async fn do_json_status_request<T: Serialize>(
-        url: &'static str,
+        url: &str,
         method: Method,
         body: &T,
         base_url: &str,
         cookie: &str,
-    ) -> Result<StatusCode, Error>;
+    ) -> Result<Metadata, Error>;
 }
