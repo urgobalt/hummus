@@ -23,6 +23,7 @@
             systemfd
             nodejs
             parallel
+            gum
           ];
 
           nativeBuildInputs = with pkgs; [

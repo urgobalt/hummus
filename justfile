@@ -2,10 +2,34 @@ set shell := ["bash", "-uc"]
 set dotenv-path := ".env"
 export PARALLEL_SHELL := "bash"
 export NODE_PACKAGE_MANAGER := "pnpm"
+export GUM_CHOOSE_HEADER_FOREGROUND := "#B2854C"
+export GUM_CHOOSE_CURSOR_FOREGROUND := "#858652"
+export GUM_CHOOSE_ITEM_FOREGROUND := "#6D7577"
 
 # List the commands
 default:
-  just --list
+  #!/usr/bin/env -S bash
+  main=$(gum choose build dev docker clean)
+  if ! [ $? = 0 ]; then
+    exit 1
+  fi
+  if [ $main = build ]; then
+    sub=$(gum choose app server ids)
+    just build-$sub
+  elif [ $main = dev ]; then
+    sub=$(gum choose app server ids all)
+    if [ $sub = all ]; then
+      just watch-full-stack
+    else
+      just watch-$sub
+    fi
+  elif [ $main = docker ]; then
+    command=$(gum choose run clean-run close)
+    service=$(gum choose store ids)
+    just docker-$command $service
+  elif [ $main = clean ]; then
+    just clean
+  fi
 
 # Prepare node_modules
 [private]
@@ -62,7 +86,7 @@ build-server: build-ui build-ids
 [private]
 [group("web")]
 inner-watch-server:
-  systemfd --no-pid -s http::$DEFAULT_PORT -- \
+  systemfd --no-pid -s http::$PORT -- \
   watchexec --wrap-process none \
     -w api -w server \
     -e rs \
