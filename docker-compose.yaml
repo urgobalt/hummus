@@ -1,0 +1,14 @@
+services:
+  base:
+    build:
+      context: .
+    image: base
+    deploy:
+      mode: replicated
+      replicas: 0
+  server:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    depends_on:
+      - base
