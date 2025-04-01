@@ -6,7 +6,7 @@ services:
     deploy:
       mode: replicated
       replicas: 0
-  server:
+  store:
     build:
       context: .
       dockerfile: ./server/Dockerfile

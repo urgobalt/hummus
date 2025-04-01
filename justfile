@@ -81,6 +81,18 @@ watch-server:
 build-ids:
   cargo build --release
 
+[group("docker")]
+docker-run service:
+  sudo docker compose up -d --build -- {{service}}
+
+[group("docker")]
+docker-clean-run service:
+  sudo docker compose up -d --build --force-recreate -- {{service}}
+
+[group("docker")]
+docker-close service:
+  sudo docker compose down -- {{service}}
+
 # Clean caches, outputs and more from the projects
 [group("global")]
 [confirm("This will remove all caches, dependencies and built binaries. Do you want to continue?")]

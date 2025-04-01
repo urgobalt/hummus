@@ -5,5 +5,5 @@ WORKDIR /app
 RUN just build-ids
 
 FROM scratch
-COPY --from=builder /app/target/release/ids /app
-ENTRYPOINT ["/app/ids"]
+COPY --from=builder /app/target/release/ids /
+ENTRYPOINT ["/ids"]

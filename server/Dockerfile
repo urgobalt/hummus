@@ -5,9 +5,10 @@ WORKDIR /app
 RUN just build-server
 
 FROM scratch
-COPY --from=builder /app/target/release/server /app/ui/dist /app
+
+COPY --from=builder /app/target/release/server /app/ui/dist /
 
 ENV PORT=80
-ENV DIST=/app/dist
+ENV DIST=/dist
 
-ENTRYPOINT [ "/app/server" ]
+ENTRYPOINT [ "/server" ]
