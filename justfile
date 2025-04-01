@@ -55,7 +55,7 @@ watch-app:
 # Build the server and ui
 [group("web")]
 [working-directory: 'server']
-build-server: build-ui
+build-server: build-ui build-ids
   cargo build --release
 
 # Start the webserver and watch for changes
@@ -74,6 +74,12 @@ watch-server:
   #!/usr/bin/env -S bash -- parallel --shebang --ungroup
   just watch-ui
   just inner-watch-server
+
+# Build the ids server
+[group("ids")]
+[working-directory: 'ids']
+build-ids:
+  cargo build --release
 
 # Clean caches, outputs and more from the projects
 [group("global")]
