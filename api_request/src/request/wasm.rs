@@ -3,6 +3,7 @@ use crate::error::Error;
 use reqwest::{Method, StatusCode, header::COOKIE};
 use serde::Deserialize;
 use serde::{Serialize, de::DeserializeOwned};
+use std::num::NonZeroU16;
 #[derive(Serialize, Deserialize)]
 struct StatusCodeIntermediary(NonZeroU16);
 impl From<StatusCode> for StatusCodeIntermediary {
@@ -79,7 +80,10 @@ mod tauri_binding {
             base_url: &str,
             cookie: &str,
         ) -> Result<(reqwest::StatusCode, R), crate::error::Error> {
-            assert!(is_tauri());
+            assert!(
+                is_tauri(),
+                "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
+            );
             let js_value = invoke_with_args(
                 "tauri_json_json_request",
                 Data(JsonJsonRequest {
@@ -103,7 +107,10 @@ mod tauri_binding {
             base_url: &str,
             cookie: &str,
         ) -> Result<(reqwest::StatusCode, R), crate::error::Error> {
-            assert!(is_tauri());
+            assert!(
+                is_tauri(),
+                "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
+            );
             let js_value = match JSON {
                 true => {
                     invoke_with_args(
@@ -143,7 +150,10 @@ mod tauri_binding {
             base_url: &str,
             cookie: &str,
         ) -> Result<reqwest::StatusCode, crate::error::Error> {
-            assert!(is_tauri());
+            assert!(
+                is_tauri(),
+                "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
+            );
             let js_value = invoke_with_args(
                 "tauri_status_request",
                 Data(StatusRequest {
@@ -165,7 +175,10 @@ mod tauri_binding {
             base_url: &str,
             cookie: &str,
         ) -> Result<reqwest::StatusCode, crate::error::Error> {
-            assert!(is_tauri());
+            assert!(
+                is_tauri(),
+                "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
+            );
             let js_value = invoke_with_args(
                 "tauri_json_status_request",
                 Data(StatusRequest {
@@ -187,7 +200,10 @@ mod tauri_binding {
             base_url: &str,
             cookie: &str,
         ) -> Result<(StatusCode, String), Error> {
-            assert!(is_tauri());
+            assert!(
+                is_tauri(),
+                "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
+            );
             let js_value = match JSON {
                 true => {
                     invoke_with_args(
@@ -416,7 +432,7 @@ mod axum_request {
         .map(|v| v.into())
     }
     #[tauri::command]
-    async fn do_string_string_request_json<'a>(
+    async fn tauri_string_string_request_json<'a>(
         value: StringStringRequest<'a>,
     ) -> Result<(StatusCodeIntermediary, String), Error> {
         Axum::do_string_string_request::<true>(
@@ -433,7 +449,7 @@ mod axum_request {
         .map(convert_to_status_code)
     }
     #[tauri::command]
-    async fn do_string_string_request_no_json<'a>(
+    async fn tauri_string_string_request_no_json<'a>(
         value: StringStringRequest<'a>,
     ) -> Result<(StatusCodeIntermediary, String), Error> {
         Axum::do_string_string_request::<false>(
