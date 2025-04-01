@@ -9,23 +9,23 @@ export GUM_CHOOSE_ITEM_FOREGROUND := "#6D7577"
 # List the commands
 default:
   #!/usr/bin/env -S bash
-  main=$(gum choose build dev docker clean)
+  main=$(gum choose --header "Pick an action:" build dev docker clean)
   if ! [ $? = 0 ]; then
     exit 1
   fi
   if [ $main = build ]; then
-    sub=$(gum choose app server ids)
+    sub=$(gum choose --header "Pick a target:" app server ids)
     just build-$sub
   elif [ $main = dev ]; then
-    sub=$(gum choose app server ids all)
+    sub=$(gum choose --header "Pick a target:" app server ids all)
     if [ $sub = all ]; then
       just watch-full-stack
     else
       just watch-$sub
     fi
   elif [ $main = docker ]; then
-    command=$(gum choose run clean-run close)
-    service=$(gum choose store ids)
+    command=$(gum choose --header "Pick a docker action:" run clean-run close build)
+    service=$(gum choose --header "Pick a target" store ids)
     just docker-$command $service
   elif [ $main = clean ]; then
     just clean
@@ -90,7 +90,7 @@ inner-watch-server:
   watchexec --wrap-process none \
     -w api -w server \
     -e rs \
-    -r -- cargo run -q --bin server
+    -r -- cargo run --bin server
 
 # Start the webserver after building the ui and watch for changes
 [group("web")]
@@ -105,17 +105,25 @@ watch-server:
 build-ids:
   cargo build --release
 
+# Build the service and start it within a docker container
 [group("docker")]
 docker-run service:
   sudo docker compose up -d --build -- {{service}}
 
+# Build the service without chache and start it within a docker container
 [group("docker")]
 docker-clean-run service:
   sudo docker compose up -d --build --force-recreate -- {{service}}
 
+# Close the services corresponding docker container
 [group("docker")]
 docker-close service:
   sudo docker compose down -- {{service}}
+
+# Build the services docker container
+[group("docker")]
+docker-build service:
+  sudo docker compose build --build -- {{service}}
 
 # Clean caches, outputs and more from the projects
 [group("global")]
