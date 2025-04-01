@@ -1,5 +1,4 @@
-use std::num::NonZeroU16;
-use super::{RequestBackend,JSON_CONTENT_TYPE};
+use super::{JSON_CONTENT_TYPE, RequestBackend};
 use crate::error::Error;
 use reqwest::{Method, StatusCode, header::COOKIE};
 use serde::Deserialize;
