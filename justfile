@@ -2,11 +2,14 @@ set shell := ["bash", "-uc"]
 set dotenv-path := ".env"
 export PARALLEL_SHELL := "bash"
 export NODE_PACKAGE_MANAGER := "pnpm"
+
 export GUM_CHOOSE_HEADER_FOREGROUND := "#B2854C"
+export GUM_CONFIRM_PROMPT_FOREGROUND := "#B2854C"
 export GUM_CHOOSE_CURSOR_FOREGROUND := "#858652"
+export GUM_CONFIRM_SELECTED_BACKGROUND := "#858652"
 export GUM_CHOOSE_ITEM_FOREGROUND := "#6D7577"
 
-# List the commands
+# Interactive ui for running the different commands
 default:
   #!/usr/bin/env -S bash
   main=$(gum choose --header "Pick an action:" build dev docker clean)
@@ -15,9 +18,15 @@ default:
   fi
   if [ $main = build ]; then
     sub=$(gum choose --header "Pick a target:" app server ids)
+    if ! [ $? = 0 ]; then
+      exit 1
+    fi
     just build-$sub
   elif [ $main = dev ]; then
     sub=$(gum choose --header "Pick a target:" app server ids all)
+    if ! [ $? = 0 ]; then
+      exit 1
+    fi
     if [ $sub = all ]; then
       just watch-full-stack
     else
@@ -25,10 +34,35 @@ default:
     fi
   elif [ $main = docker ]; then
     command=$(gum choose --header "Pick a docker action:" run clean-run close build)
+    if [ $? -ne 0 ]; then
+      exit 1
+    fi
     service=$(gum choose --header "Pick a target" store ids)
+    if ! [ $? = 0 ]; then
+      exit 1
+    fi
+    if [ $EUID -ne 0 ]; then
+      gum confirm "Do you want to run the docker command with sudo?"
+      if [ $? = 0 ]; then
+        echo " >> Running docker with sudo permissions"
+        sudo just docker-$command $service
+        exit 0
+      fi
+    fi
     just docker-$command $service
   elif [ $main = clean ]; then
     just clean
+  fi
+
+[private]
+ask-sudo:
+  #!/usr/bin/env -S bash
+  if [ $EUID -ne 0 ]; then
+    gum confirm "Do you want to run the docker command with sudo?"
+    if [ $? = 0 ]; then
+      exit 0
+    fi
+    exit 1
   fi
 
 # Prepare node_modules
@@ -108,33 +142,31 @@ build-ids:
 # Build the service and start it within a docker container
 [group("docker")]
 docker-run service:
-  sudo docker compose up -d --build -- {{service}}
+  docker compose up -d --build -- {{service}}
 
 # Build the service without chache and start it within a docker container
 [group("docker")]
 docker-clean-run service:
-  sudo docker compose up -d --build --force-recreate -- {{service}}
+  docker compose up -d --build --force-recreate -- {{service}}
 
 # Close the services corresponding docker container
 [group("docker")]
 docker-close service:
-  sudo docker compose down -- {{service}}
+  docker compose down -- {{service}}
 
 # Build the services docker container
 [group("docker")]
 docker-build service:
-  sudo docker compose build --build -- {{service}}
+  docker compose build --build -- {{service}}
 
 # Clean caches, outputs and more from the projects
-[group("global")]
-[confirm("This will remove all caches, dependencies and built binaries. Do you want to continue?")]
 clean:
-  #!/usr/bin/env -S bash -- parallel --shebang --ungroup
-  rm ui/dist -rvd 2>/dev/null
-  cargo clean 2>/dev/null
+  @gum confirm "This will remove all caches, dependencies and built binaries. Do you want to continue?" || exit 1
+  parallel ::: \
+  "rm ui/dist -rvd 2>/dev/null" \
+  "cargo clean -vv 2>/dev/null"
 
 # Deploys development of all parts of the application and watches for changes
-[group("global")]
 watch-full-stack:
   #!/usr/bin/env -S bash -- parallel --shebang --ungroup
   just dev-ui
