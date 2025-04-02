@@ -115,7 +115,7 @@ mod tauri_binding {
             body: &T,
             base_url: &str,
             cookie: &str,
-        ) -> Result<(reqwest::StatusCode, R), crate::error::Error> {
+        ) -> Result<(Metadata, R), crate::error::Error> {
             assert!(
                 is_tauri(),
                 "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
@@ -142,7 +142,7 @@ mod tauri_binding {
             body: String,
             base_url: &str,
             cookie: &str,
-        ) -> Result<(reqwest::StatusCode, R), crate::error::Error> {
+        ) -> Result<(Metadata, R), crate::error::Error> {
             assert!(
                 is_tauri(),
                 "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
@@ -185,7 +185,7 @@ mod tauri_binding {
             method: reqwest::Method,
             base_url: &str,
             cookie: &str,
-        ) -> Result<reqwest::StatusCode, crate::error::Error> {
+        ) -> Result<Metadata, crate::error::Error> {
             assert!(
                 is_tauri(),
                 "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
@@ -210,7 +210,7 @@ mod tauri_binding {
             body: &T,
             base_url: &str,
             cookie: &str,
-        ) -> Result<reqwest::StatusCode, crate::error::Error> {
+        ) -> Result<Metadata, crate::error::Error> {
             assert!(
                 is_tauri(),
                 "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
@@ -235,7 +235,7 @@ mod tauri_binding {
             body: String,
             base_url: &str,
             cookie: &str,
-        ) -> Result<(StatusCode, String), Error> {
+        ) -> Result<(Metadata, String), Error> {
             assert!(
                 is_tauri(),
                 "To be running in a tauri enviroment based on the compile flags and RequestBackend used"
