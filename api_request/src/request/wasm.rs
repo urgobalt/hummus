@@ -1,9 +1,8 @@
-use super::{JSON_CONTENT_TYPE, Metadata, RequestBackend};
-use crate::error::Error;
+use super::Metadata;
+use reqwest::StatusCode;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
-use reqwest::{Method, StatusCode, header::COOKIE};
 use serde::Deserialize;
-use serde::{Serialize, de::DeserializeOwned};
+use serde::Serialize;
 use std::collections::HashMap;
 use std::num::NonZeroU16;
 use std::str::FromStr;
@@ -22,8 +21,9 @@ impl Into<StatusCode> for StatusCodeIntermediary {
         StatusCode::from_u16(self.0.into()).expect("Invalid code saved")
     }
 }
+/// A struct to cary the intermidiary of the metadata between the frontend and backend
 #[derive(Serialize, Deserialize)]
-struct MetadataIntermidiary {
+pub struct MetadataIntermidiary {
     status: StatusCodeIntermediary,
     headers: HashMap<Option<String>, Vec<u8>>,
 }
@@ -55,39 +55,49 @@ impl Into<Metadata> for MetadataIntermidiary {
         }
     }
 }
+#[allow(unused)]
+#[cfg(feature = "tauri")]
 #[derive(Serialize)]
-pub(crate) struct StatusRequest<'a> {
+pub struct StatusRequest<'a> {
     url: &'a str,
     method: &'a str,
     base_url: &'a str,
     cookie: &'a str,
 }
+#[allow(unused)]
+#[cfg(feature = "tauri")]
 #[derive(Serialize)]
-pub(crate) struct StringJsonRequest<'a> {
-    url: &'a str,
-    method: &'a str,
-    body: String,
-    base_url: &'a str,
-    cookie: &'a str,
-}
-#[derive(Serialize)]
-pub(crate) struct JsonJsonRequest<'a> {
+pub struct StringJsonRequest<'a> {
     url: &'a str,
     method: &'a str,
     body: String,
     base_url: &'a str,
     cookie: &'a str,
 }
+#[allow(unused)]
+#[cfg(feature = "tauri")]
 #[derive(Serialize)]
-pub(crate) struct JsonStatusRequest<'a> {
+pub struct JsonJsonRequest<'a> {
     url: &'a str,
     method: &'a str,
     body: String,
     base_url: &'a str,
     cookie: &'a str,
 }
+#[allow(unused)]
+#[cfg(feature = "tauri")]
 #[derive(Serialize)]
-pub(crate) struct StringStringRequest<'a> {
+pub struct JsonStatusRequest<'a> {
+    url: &'a str,
+    method: &'a str,
+    body: String,
+    base_url: &'a str,
+    cookie: &'a str,
+}
+#[allow(unused)]
+#[cfg(feature = "tauri")]
+#[derive(Serialize)]
+pub struct StringStringRequest<'a> {
     url: &'a str,
     method: &'a str,
     body: String,
@@ -95,19 +105,21 @@ pub(crate) struct StringStringRequest<'a> {
     cookie: &'a str,
 }
 
-#[cfg(all(feature = "tauri-wasm", target_arch = "wasm32"))]
+#[cfg(all(feature = "tauri", target_arch = "wasm32"))]
 pub type Tauri = WasmTauri;
-#[cfg(all(feature = "tauri-wasm", target_arch = "wasm32"))]
+#[cfg(all(feature = "tauri", target_arch = "wasm32"))]
 pub struct WasmTauri;
-#[cfg(all(feature = "tauri-wasm", target_arch = "wasm32"))]
+#[cfg(all(feature = "tauri", target_arch = "wasm32"))]
 mod tauri_binding {
-    use super::*;
-    use crate::Metadata;
-    use crate::request::RequestBackend;
-    use crate::request::wasm::JsonJsonRequest;
+    use super::{
+        JsonJsonRequest, JsonStatusRequest, Metadata, MetadataIntermidiary, StatusRequest,
+        StringJsonRequest, StringStringRequest, WasmTauri,
+    };
+    use crate::Error;
+    use crate::RequestBackend;
+    use reqwest::Method;
     use tauri_wasm::Data;
     use tauri_wasm::{invoke_with_args, is_tauri};
-
     impl RequestBackend for WasmTauri {
         async fn do_json_json_request<T: serde::Serialize, R: serde::de::DeserializeOwned>(
             url: &str,
@@ -217,8 +229,9 @@ mod tauri_binding {
             );
             let js_value = invoke_with_args(
                 "tauri_json_status_request",
-                Data(StatusRequest {
+                Data(JsonStatusRequest {
                     url,
+                    body: serde_json::to_string(body)?,
                     method: method.as_str(),
                     base_url,
                     cookie,
@@ -287,19 +300,26 @@ pub type Tauri = Axum;
 #[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 pub struct Axum;
 #[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
-mod axum_request {
-    use std::sync::OnceLock;
-
+pub use tauri_backend::*;
+#[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
+mod tauri_backend {
+    use super::{
+        Axum, JsonJsonRequest, JsonStatusRequest, Metadata, MetadataIntermidiary, StatusRequest,
+        StringJsonRequest, StringStringRequest,
+    };
+    use crate::Error;
+    use crate::JSON_CONTENT_TYPE;
+    use crate::RequestBackend;
     use axum::Router;
     use axum::body::{Body, to_bytes};
-    use axum::http::{HeaderValue, Request, Response};
+    use axum::http::{Request, Response};
+    use reqwest::Method;
     use reqwest::header::CONTENT_TYPE;
+    use reqwest::header::COOKIE;
+    use serde::{Serialize, de::DeserializeOwned};
     use std::sync::Mutex;
+    use std::sync::OnceLock;
     use tower_service::Service;
-
-    use crate::request;
-
-    use super::*;
     impl RequestBackend for Axum {
         async fn do_json_json_request<T: Serialize, R: DeserializeOwned>(
             url: &str,
@@ -392,7 +412,7 @@ mod axum_request {
             ))
         }
     }
-    #[tauri::command]
+    #[tauri_macros::command]
     pub async fn tauri_json_json_request<'a>(
         value: JsonJsonRequest<'a>,
     ) -> Result<(MetadataIntermidiary, String), Error> {
@@ -409,8 +429,8 @@ mod axum_request {
         .await
         .map(convert_to_status_code)
     }
-    #[tauri::command]
-    async fn tauri_string_json_request_json<'a>(
+    #[tauri_macros::command]
+    pub async fn tauri_string_json_request_json<'a>(
         value: StringJsonRequest<'a>,
     ) -> Result<(MetadataIntermidiary, String), Error> {
         Axum::do_string_string_request::<true>(
@@ -426,8 +446,8 @@ mod axum_request {
         .await
         .map(convert_to_status_code)
     }
-    #[tauri::command]
-    async fn tauri_string_json_request_no_json<'a>(
+    #[tauri_macros::command]
+    pub async fn tauri_string_json_request_no_json<'a>(
         value: StringJsonRequest<'a>,
     ) -> Result<(MetadataIntermidiary, String), Error> {
         Axum::do_string_string_request::<false>(
@@ -443,7 +463,7 @@ mod axum_request {
         .await
         .map(convert_to_status_code)
     }
-    #[tauri::command]
+    #[tauri_macros::command]
     pub async fn tauri_json_status_request<'a>(
         value: JsonStatusRequest<'a>,
     ) -> Result<MetadataIntermidiary, Error> {
@@ -461,7 +481,7 @@ mod axum_request {
         .map(convert_to_status_code)
         .map(|(s, ())| s)
     }
-    #[tauri::command]
+    #[tauri_macros::command]
     pub async fn tauri_status_request<'a>(
         value: StatusRequest<'a>,
     ) -> Result<MetadataIntermidiary, Error> {
@@ -477,8 +497,8 @@ mod axum_request {
         .await
         .map(|v| v.into())
     }
-    #[tauri::command]
-    async fn tauri_string_string_request_json<'a>(
+    #[tauri_macros::command]
+    pub async fn tauri_string_string_request_json<'a>(
         value: StringStringRequest<'a>,
     ) -> Result<(MetadataIntermidiary, String), Error> {
         Axum::do_string_string_request::<true>(
@@ -494,8 +514,8 @@ mod axum_request {
         .await
         .map(convert_to_status_code)
     }
-    #[tauri::command]
-    async fn tauri_string_string_request_no_json<'a>(
+    #[tauri_macros::command]
+    pub async fn tauri_string_string_request_no_json<'a>(
         value: StringStringRequest<'a>,
     ) -> Result<(MetadataIntermidiary, String), Error> {
         Axum::do_string_string_request::<false>(

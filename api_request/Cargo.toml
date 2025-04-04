@@ -5,20 +5,28 @@ edition = "2024"
 [lib]
 
 [features]
-tauri = [ "dep:axum" , "dep:tower-service","dep:tauri"]
-tauri-wasm = [ "dep:tauri-wasm", "dep:serde-wasm-bindgen","dep:wasm-bindgen"]
+tauri = [
+    "dep:axum",
+    "dep:tower-service",
+    "dep:tauri-macros",
+    "dep:http-body-util",
+    "dep:tauri-wasm",
+    "dep:serde-wasm-bindgen",
+    "dep:wasm-bindgen",
+]
 
 [dependencies]
-serde_json={version="1.0.140"}
-reqwest = { version = "0.12.15", features = ["gzip", "json"] }
-serde = { version = "1.0.219", features = ["derive"] }
+serde_json={version="1.0.140",default-features=false}
+reqwest = { version = "0.12.15", features = ["gzip", "json"] ,default-features=false}
+serde = { version = "1.0.219", features = ["derive"] ,default-features=false}
 
-# tauri-wasm
-serde-wasm-bindgen = {version="0.6", optional=true}
-tauri-wasm ={version="0.1.2", features=["serde"],optional = true}
-wasm-bindgen={version="0.2.100", optional=true}
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+serde-wasm-bindgen = { version = "0.6", optional = true, default-features = false }
+tauri-wasm = { version = "0.1.2", features = ["serde"], optional = true, default-features = false }
+wasm-bindgen = { version = "0.2.100", optional = true, default-features = false }
 
-#tauri
-axum = {version="0.8.3",optional = true}
-tauri = {version="2.4.0",optional = true,default-features=false}
-tower-service = {version="0.3.1",optional = true}
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+axum = { version = "0.8.3", optional = true, default-features = false }
+tauri-macros = { version = "2.1.1", optional = true, default-features = false }
+tower-service = { version = "0.3.1", optional = true, default-features = false }
+http-body-util = { version = "0.1.3", optional = true, default-features = false }

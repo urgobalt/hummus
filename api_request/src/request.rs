@@ -2,11 +2,16 @@ use crate::error::Error;
 use reqwest::header::HeaderMap;
 use reqwest::{Method, StatusCode};
 use serde::{Serialize, de::DeserializeOwned};
+pub const JSON_CONTENT_TYPE: &str = "application/json";
+mod native;
+mod wasm;
+pub use wasm::*;
 pub struct Metadata {
     headers: HeaderMap,
     status: StatusCode,
 }
 impl Metadata {
+    #[allow(unused)]
     fn new(headers: HeaderMap, status: StatusCode) -> Self {
         Self { headers, status }
     }
@@ -27,10 +32,6 @@ impl From<(StatusCode, &HeaderMap)> for Metadata {
         }
     }
 }
-pub const JSON_CONTENT_TYPE: &str = "application/json";
-mod native;
-mod wasm;
-pub use native::Native;
 #[cfg(all(feature = "tauri", target_arch = "wasm32"))]
 pub type DefaultBackend = wasm::WasmTauri;
 
@@ -38,15 +39,15 @@ pub type DefaultBackend = wasm::WasmTauri;
 pub type DefaultBackend = wasm::Axum;
 
 #[cfg(not(feature = "tauri"))]
-pub type DefaultBackend = Native;
+pub type DefaultBackend = native::Native;
 
 pub trait RequestBackend {
     #[cfg(all(feature = "tauri", target_arch = "wasm32"))]
-    const DEFAULT: WasmTauri = WasmTauri;
+    const DEFAULT: wasm::WasmTauri = wasm::WasmTauri;
     #[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
     const DEFAULT: wasm::Axum = wasm::Axum;
     #[cfg(not(feature = "tauri"))]
-    const DEFAULT: Native = Native;
+    const DEFAULT: native::Native = native::Native;
     async fn do_json_json_request<T: Serialize, R: DeserializeOwned>(
         url: &str,
         method: Method,

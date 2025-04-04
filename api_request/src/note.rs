@@ -1,12 +1,11 @@
-use reqwest::{Method, StatusCode};
-use serde::{Deserialize, Serialize};
-
 use crate::error::Error;
 use crate::request::RequestBackend;
 use crate::{Metadata, Session};
+use reqwest::Method;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, PartialEq, Deserialize, Clone)]
-struct NoteSearch {
+pub struct NoteSearch {
     name: String,
 }
 #[derive(Serialize, PartialEq, Deserialize, Clone, Copy)]

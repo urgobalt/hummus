@@ -2,7 +2,7 @@ use super::{JSON_CONTENT_TYPE, Metadata, RequestBackend};
 use crate::error::Error;
 use reqwest::Client;
 use reqwest::header::CONTENT_TYPE;
-use reqwest::{Method, StatusCode, header::COOKIE};
+use reqwest::{Method, header::COOKIE};
 use serde::{Serialize, de::DeserializeOwned};
 
 pub struct Native;

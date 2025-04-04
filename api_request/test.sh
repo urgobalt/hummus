@@ -1,1 +1,1 @@
-cargo build -q -F tauri --target x86_64-unknown-linux-gnu && cargo build -q -F tauri-wasm --target wasm32-unknown-unknown && cargo build -q --target wasm32-unknown-unknown && cargo build -q --target x86_64-unknown-linux-gnu && echo "tada"
+cargo build -q -F tauri --target x86_64-unknown-linux-gnu && cargo build -q -F tauri --target wasm32-unknown-unknown && cargo build -q --target wasm32-unknown-unknown && cargo build -q --target x86_64-unknown-linux-gnu && echo "tada"

@@ -1,7 +1,8 @@
 #![allow(async_fn_in_trait)]
-pub mod error;
+mod error;
 pub mod note;
 mod request;
+pub use error::Error;
 pub use request::*;
 use serde::{Deserialize, Serialize};
 #[derive(Serialize, PartialEq, Deserialize, Clone)]
