@@ -11,19 +11,19 @@ tauri = [
     "dep:tauri-macros",
     "dep:http-body-util",
     "dep:tauri-wasm",
-    "dep:serde-wasm-bindgen",
-    "dep:wasm-bindgen",
 ]
 
 [dependencies]
 serde_json={version="1.0.140",default-features=false}
 reqwest = { version = "0.12.15", features = ["gzip", "json"] ,default-features=false}
 serde = { version = "1.0.219", features = ["derive"] ,default-features=false}
+tsify-next = { version = "0.5.5", features = ["js"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-serde-wasm-bindgen = { version = "0.6", optional = true, default-features = false }
+serde-wasm-bindgen = { version = "0.6", default-features = false }
 tauri-wasm = { version = "0.1.2", features = ["serde"], optional = true, default-features = false }
-wasm-bindgen = { version = "0.2.100", optional = true, default-features = false }
+tsify-next = { version = "0.5.3"}
+wasm-bindgen = { version = "0.2.100" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 axum = { version = "0.8.3", optional = true, default-features = false }

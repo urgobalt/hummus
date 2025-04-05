@@ -3,18 +3,43 @@ use crate::request::RequestBackend;
 use crate::{Metadata, Session};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
-
+#[cfg(target_arch = "wasm32")]
+use tsify_next::Tsify;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
 #[derive(Serialize, PartialEq, Deserialize, Clone)]
+#[cfg_attr(
+    target_arch = "wasm32",
+    derive(tsify_next::Tsify),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
 pub struct NoteSearch {
     name: String,
 }
 #[derive(Serialize, PartialEq, Deserialize, Clone, Copy)]
+#[cfg_attr(
+    target_arch = "wasm32",
+    derive(tsify_next::Tsify),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
 pub struct NoteID(pub u64);
+
 #[derive(Serialize, PartialEq, Deserialize)]
+#[cfg_attr(
+    target_arch = "wasm32",
+    derive(tsify_next::Tsify),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
 pub struct Note {
     text: String,
 }
+
 #[derive(Serialize, PartialEq, Deserialize)]
+#[cfg_attr(
+    target_arch = "wasm32",
+    derive(tsify_next::Tsify),
+    tsify(into_wasm_abi, from_wasm_abi)
+)]
 pub struct NoteUpdate {
     note: Note,
     note_id: NoteID,
