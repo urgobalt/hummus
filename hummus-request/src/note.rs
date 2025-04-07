@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::request::RequestBackend;
-use crate::{Metadata, Session};
+use crate::{Metadata, ResponseResult, Session};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 #[cfg(target_arch = "wasm32")]
@@ -48,7 +48,7 @@ pub async fn get_note<B: RequestBackend>(
     note: NoteID,
     store: &str,
     cookie: &str,
-) -> Result<(Metadata, Note), Error> {
+) -> ResponseResult<Note> {
     B::do_string_json_request::<true, Note>(
         &format!("api/note/{}", note.0),
         Method::PUT,
@@ -58,10 +58,7 @@ pub async fn get_note<B: RequestBackend>(
     )
     .await
 }
-pub async fn add_new_note<B: RequestBackend>(
-    note: &Note,
-    session: &Session,
-) -> Result<Metadata, Error> {
+pub async fn add_new_note<B: RequestBackend>(note: &Note, session: &Session) -> ResponseResult<()> {
     B::do_json_status_request(
         "api/note",
         Method::PUT,
@@ -74,7 +71,7 @@ pub async fn add_new_note<B: RequestBackend>(
 pub async fn update_note<B: RequestBackend>(
     note: &NoteUpdate,
     session: &Session,
-) -> Result<(Metadata, Option<Note>), Error> {
+) -> ResponseResult<Option<Note>> {
     B::do_json_json_request(
         "api/note",
         Method::PATCH,
@@ -87,7 +84,7 @@ pub async fn update_note<B: RequestBackend>(
 pub async fn delete_note<B: RequestBackend>(
     note: &NoteID,
     session: &Session,
-) -> Result<Metadata, Error> {
+) -> ResponseResult<()> {
     B::do_json_status_request(
         "api/note",
         Method::DELETE,
@@ -100,7 +97,7 @@ pub async fn delete_note<B: RequestBackend>(
 pub async fn search_notes<B: RequestBackend>(
     search: &NoteSearch,
     session: &Session,
-) -> Result<(Metadata, Vec<NoteID>), Error> {
+) -> ResponseResult<Vec<NoteID>> {
     B::do_json_json_request(
         "api/notes/search",
         Method::GET,
@@ -110,9 +107,7 @@ pub async fn search_notes<B: RequestBackend>(
     )
     .await
 }
-pub async fn get_all_notes<B: RequestBackend>(
-    session: &Session,
-) -> Result<(Metadata, Vec<NoteID>), Error> {
+pub async fn get_all_notes<B: RequestBackend>(session: &Session) -> ResponseResult<Vec<NoteID>> {
     B::do_string_json_request::<true, Vec<NoteID>>(
         "api/notes",
         Method::GET,

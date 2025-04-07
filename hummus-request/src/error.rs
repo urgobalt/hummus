@@ -1,15 +1,22 @@
+use serde::Serialize;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+#[cfg_attr(
+    target_arch = "wasm32",
+    derive(tsify_next::Tsify, Serialize),
+    tsify(into_wasm_abi),
+    tsify(namespace)
+)]
 pub enum Error {
-    Reqwest(reqwest::Error),
+    Reqwest(String),
     Axum(String),
-    #[cfg(all(feature = "tauri", target_arch = "wasm32"))]
-    WasmSerde(serde_wasm_bindgen::Error),
-    #[cfg(all(feature = "tauri", target_arch = "wasm32"))]
-    WasmTauri(tauri_wasm::Error),
-    Serde(serde_json::Error),
+    WasmSerde(String),
+    WasmTauri(String),
+    Serde(String),
 }
 impl From<reqwest::Error> for Error {
     fn from(value: reqwest::Error) -> Self {
-        Self::Reqwest(value)
+        return Self::Reqwest(value.to_string());
     }
 }
 #[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
@@ -27,17 +34,17 @@ impl From<axum::Error> for Error {
 #[cfg(all(feature = "tauri", target_arch = "wasm32"))]
 impl From<serde_wasm_bindgen::Error> for Error {
     fn from(value: serde_wasm_bindgen::Error) -> Self {
-        Self::WasmSerde(value)
+        Self::WasmSerde(value.to_string())
     }
 }
 #[cfg(all(feature = "tauri", target_arch = "wasm32"))]
 impl From<tauri_wasm::Error> for Error {
     fn from(value: tauri_wasm::Error) -> Self {
-        Self::WasmTauri(value)
+        Self::WasmTauri(value.to_string())
     }
 }
 impl From<serde_json::Error> for Error {
     fn from(value: serde_json::Error) -> Self {
-        Self::Serde(value)
+        return Self::Serde(value.to_string());
     }
 }

@@ -5,4 +5,4 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.1"
-api_request={path="../api_request/"}
+hummus-request={path="../hummus-request/"}

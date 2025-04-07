@@ -91,23 +91,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dcfed56ad506cb2c684a14971b8861fdc3baaaae314b9e5f9bb532cbe3ba7a4f"
 
 [[package]]
-name = "api_request"
-version = "0.1.0"
-dependencies = [
- "axum",
- "http-body-util",
- "reqwest",
- "serde",
- "serde-wasm-bindgen",
- "serde_json",
- "tauri-macros",
- "tauri-wasm",
- "tower-service",
- "tsify-next",
- "wasm-bindgen",
-]
-
-[[package]]
 name = "app"
 version = "0.1.0"
 dependencies = [
@@ -1476,6 +1459,45 @@ name = "httpdate"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
+
+[[package]]
+name = "hummus-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.100",
+]
+
+[[package]]
+name = "hummus-request"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "http-body-util",
+ "reqwest",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "tauri-macros",
+ "tauri-wasm",
+ "tower-service",
+ "tsify-next",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "hummus-wasm"
+version = "0.1.0"
+dependencies = [
+ "hummus-macros",
+ "hummus-request",
+ "paste",
+ "serde",
+ "tsify-next",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+]
 
 [[package]]
 name = "hyper"
@@ -3388,8 +3410,8 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 name = "store"
 version = "0.1.0"
 dependencies = [
- "api_request",
  "axum",
+ "hummus-request",
 ]
 
 [[package]]
@@ -4356,16 +4378,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9683f9a5a998d873c0d21fcbe3c083009670149a8fab228644b8bd36b2c48cb3"
 dependencies = [
  "wit-bindgen-rt",
-]
-
-[[package]]
-name = "wasm"
-version = "0.1.0"
-dependencies = [
- "api_request",
- "paste",
- "wasm-bindgen",
- "wasm-bindgen-futures",
 ]
 
 [[package]]

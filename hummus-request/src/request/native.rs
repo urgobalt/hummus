@@ -1,10 +1,9 @@
-use super::{JSON_CONTENT_TYPE, Metadata, RequestBackend};
-use crate::error::Error;
+use super::{JSON_CONTENT_TYPE, RequestBackend, ResponseResult};
 use reqwest::Client;
 use reqwest::header::CONTENT_TYPE;
 use reqwest::{Method, header::COOKIE};
 use serde::{Serialize, de::DeserializeOwned};
-
+/// Using direct communication using [`reqwest`]
 pub struct Native;
 impl RequestBackend for Native {
     #[inline(always)]
@@ -14,14 +13,14 @@ impl RequestBackend for Native {
         body: &T,
         base_url: &str,
         cookie: &str,
-    ) -> Result<(Metadata, R), Error> {
+    ) -> ResponseResult<R> {
         let resp = Client::new()
             .request(method, format!("{base_url}/{url}"))
             .header(COOKIE, cookie)
             .json(body)
             .send()
             .await?;
-        Ok(((resp.headers(), resp.status()).into(), resp.json().await?))
+        Ok(((resp.headers().clone(), resp.status()), resp.json().await?).into())
     }
     #[inline(always)]
     async fn do_string_json_request<const JSON: bool, R: DeserializeOwned>(
@@ -30,7 +29,7 @@ impl RequestBackend for Native {
         body: String,
         base_url: &str,
         cookie: &str,
-    ) -> Result<(Metadata, R), Error> {
+    ) -> ResponseResult<R> {
         let mut resp = Client::new()
             .request(method, format!("{base_url}/{url}"))
             .header(COOKIE, cookie);
@@ -38,7 +37,7 @@ impl RequestBackend for Native {
             resp = resp.header(CONTENT_TYPE, JSON_CONTENT_TYPE)
         }
         let resp = resp.body(body).send().await?;
-        Ok(((resp.headers(), resp.status()).into(), resp.json().await?))
+        Ok(((resp.headers().clone(), resp.status()), resp.json().await?).into())
     }
     #[inline(always)]
     async fn do_json_status_request<T: Serialize>(
@@ -47,7 +46,7 @@ impl RequestBackend for Native {
         body: &T,
         base_url: &str,
         cookie: &str,
-    ) -> Result<Metadata, Error> {
+    ) -> ResponseResult<()> {
         let resp = Client::new()
             .request(method, format!("{base_url}/{url}"))
             .header(COOKIE, cookie)
@@ -62,7 +61,7 @@ impl RequestBackend for Native {
         method: Method,
         base_url: &str,
         cookie: &str,
-    ) -> Result<Metadata, Error> {
+    ) -> ResponseResult<()> {
         let resp = Client::new()
             .request(method, format!("{base_url}/{url}"))
             .header(COOKIE, cookie)
@@ -77,7 +76,7 @@ impl RequestBackend for Native {
         body: String,
         base_url: &str,
         cookie: &str,
-    ) -> Result<(Metadata, String), Error> {
+    ) -> ResponseResult<String> {
         let mut resp = Client::new()
             .request(method, format!("{base_url}/{url}"))
             .header(COOKIE, cookie);
@@ -85,6 +84,6 @@ impl RequestBackend for Native {
             resp = resp.header(CONTENT_TYPE, JSON_CONTENT_TYPE)
         }
         let resp = resp.body(body).send().await?;
-        Ok(((resp.headers(), resp.status()).into(), resp.text().await?))
+        Ok(((resp.headers().clone(), resp.status()), resp.text().await?).into())
     }
 }

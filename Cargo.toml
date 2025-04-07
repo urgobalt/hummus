@@ -1,3 +1,3 @@
 [workspace]
 resolver = "2"
-members = ["app", "store","api_request", "server", "ids", "wasm"]
+members = ["app", "store","hummus-request", "server", "ids", "hummus-wasm", "hummus-macros"]
