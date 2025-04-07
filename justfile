@@ -46,21 +46,21 @@ prepare-ui:
 [group("ui")]
 [working-directory: 'ui']
 build-ui: prepare-ui
-  $NODE_PACKAGE_MANAGER rsbuild build
+  $NODE_PACKAGE_MANAGER vite build
 
 # Build the ui in watch mode
 [private]
 [group("ui")]
 [working-directory: 'ui']
 watch-ui: prepare-ui
-  $NODE_PACKAGE_MANAGER rsbuild build -w
+  $NODE_PACKAGE_MANAGER vite build -w
 
 # Launch ui in development mode
 [private]
 [group("ui")]
 [working-directory: 'ui']
 dev-ui: prepare-ui
-  $NODE_PACKAGE_MANAGER rsbuild dev -w
+  $NODE_PACKAGE_MANAGER vite dev -w
 
 # Build the native tauri application
 [group("app")]

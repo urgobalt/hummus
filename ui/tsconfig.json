@@ -27,5 +27,5 @@
     "src",
     "vite.config.ts",
     "tailwind.config.js"
-  ]
+, "env.d.ts"  ]
 }
