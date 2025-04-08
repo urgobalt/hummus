@@ -1494,7 +1494,6 @@ dependencies = [
  "hummus-request",
  "paste",
  "serde",
- "tsify-next",
  "wasm-bindgen",
  "wasm-bindgen-futures",
 ]

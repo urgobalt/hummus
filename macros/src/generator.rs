@@ -4,7 +4,7 @@ use quote::{ToTokens, quote};
 use syn::spanned::Spanned;
 use syn::{Result, Type, TypeReference, parse_quote}; // Use syn 2.0 Result
 
-use super::parser::{Argument, MacroInput};
+use super::parser::MacroInput;
 
 /// Checks if a syn::Type represents a reference (e.g., &T, &'a T, &'a mut T)
 fn is_reference_type(ty: &Type) -> bool {
@@ -68,7 +68,7 @@ pub fn generate_code(input: MacroInput) -> Result<TokenStream2> {
         let func_code = quote! {
             #[wasm_bindgen::prelude::wasm_bindgen]
             pub async fn #func_name ( #( #wasm_signature_args ),* ) -> #ret_type {
-                ( #namespace :: #func_name :: <#generic_type> ( #( #call_args ),* ) ).await
+                ( #namespace :: #func_name :: <#generic_type> ( #( #call_args ),* ) ).await.map(|value|value.into())
             }
         };
         generated_functions.push(func_code);

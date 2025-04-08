@@ -4,17 +4,16 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-hummus-request={path="../hummus-request/"}
+hummus-request={path="../request/"}
 paste = "1.0"
 wasm-bindgen = { version = "0.2.100" }
 wasm-bindgen-futures = "0.4.42"
 serde = { version = "1.0.219", features = ["derive"] ,default-features=false}
-hummus-macros={path="../hummus-macros/"}
-tsify-next = { version = "0.5.5", features = ["js"] }
+hummus-macros={path="../macros/"}
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = [
-    "-O4",
+    "-Oz",
 ]
 
 [features]

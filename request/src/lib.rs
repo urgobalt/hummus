@@ -1,12 +1,11 @@
 #![allow(async_fn_in_trait)]
+pub mod api;
+pub mod definitions;
 mod error;
-pub mod note;
 mod request;
 pub use error::Error;
 pub use request::*;
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 #[derive(Serialize, PartialEq, Deserialize, Clone)]

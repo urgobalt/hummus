@@ -6,6 +6,7 @@ pub const JSON_CONTENT_TYPE: &str = "application/json";
 mod native;
 pub mod response;
 mod tauri;
+#[cfg(feature = "tauri")]
 pub use tauri::*;
 #[cfg(all(feature = "tauri", target_arch = "wasm32"))]
 pub type DefaultBackend = tauri::WasmTauri;

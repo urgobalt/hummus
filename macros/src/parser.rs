@@ -4,7 +4,7 @@ use syn::{
     punctuated::Punctuated,
     token,
 };
-
+#[allow(unused)]
 pub struct Argument {
     pub name: Ident,
     pub colon_token: token::Colon,
@@ -21,6 +21,7 @@ impl Parse for Argument {
     }
 }
 
+#[allow(unused)]
 pub struct FunctionSpec {
     pub brace_token: token::Brace,
     pub name: Ident,
@@ -57,6 +58,7 @@ impl Parse for FunctionSpec {
     }
 }
 
+#[allow(unused)]
 pub struct MacroInput {
     pub namespace: Path,
     pub comma_token: token::Comma,

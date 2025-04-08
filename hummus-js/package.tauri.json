@@ -1,0 +1,17 @@
+{
+  "name": "@hummus/tauri",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "tauri_bg.wasm",
+    "tauri.js",
+    "tauri_bg.js",
+    "tauri.d.ts"
+  ],
+  "main": "tauri.js",
+  "types": "tauri.d.ts",
+  "sideEffects": [
+    "./tauri.js",
+    "./snippets/*"
+  ]
+}

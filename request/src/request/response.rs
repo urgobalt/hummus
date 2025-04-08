@@ -72,7 +72,7 @@ impl From<RequestStatusCode> for StatusCode {
 /// The headers and statuscode of the response
 pub struct Metadata {
     status: StatusCode,
-    headers: HashMap<Option<String>, Vec<u8>>,
+    headers: HashMap<Option<String>, Result<String, String>>,
 }
 impl Metadata {
     #[allow(unused)]
@@ -81,7 +81,12 @@ impl Metadata {
             status: status.into(),
             headers: map
                 .into_iter()
-                .map(|(v, e)| (v.map(|e| e.as_str().to_string()), e.as_bytes().to_vec()))
+                .map(|(v, e)| {
+                    (
+                        v.map(|e| e.as_str().to_string()),
+                        String::from_utf8(e.as_bytes().to_vec()).map_err(|e| e.to_string()),
+                    )
+                })
                 .collect(),
         }
     }
@@ -91,7 +96,12 @@ impl From<(RequestStatusCode, HeaderMap)> for Metadata {
         Self {
             headers: headermap
                 .into_iter()
-                .map(|(v, e)| (v.map(|e| e.as_str().to_string()), e.as_bytes().to_vec()))
+                .map(|(v, e)| {
+                    (
+                        v.map(|e| e.as_str().to_string()),
+                        String::from_utf8(e.as_bytes().to_vec()).map_err(|e| e.to_string()),
+                    )
+                })
                 .collect(),
             status: status.into(),
         }
@@ -102,7 +112,12 @@ impl From<(HeaderMap, RequestStatusCode)> for Metadata {
         Self {
             headers: headermap
                 .into_iter()
-                .map(|(v, e)| (v.map(|e| e.as_str().to_string()), e.as_bytes().to_vec()))
+                .map(|(v, e)| {
+                    (
+                        v.map(|e| e.as_str().to_string()),
+                        String::from_utf8(e.as_bytes().to_vec()).map_err(|e| e.to_string()),
+                    )
+                })
                 .collect(),
             status: status.into(),
         }
@@ -113,7 +128,12 @@ impl From<(&HeaderMap, RequestStatusCode)> for Metadata {
         Self {
             headers: headermap
                 .into_iter()
-                .map(|(v, e)| (Some(v.as_str().to_string()), e.as_bytes().to_vec()))
+                .map(|(v, e)| {
+                    (
+                        Some(v.as_str().to_string()),
+                        String::from_utf8(e.as_bytes().to_vec()).map_err(|e| e.to_string()),
+                    )
+                })
                 .collect(),
             status: status.into(),
         }
@@ -125,7 +145,12 @@ impl From<(RequestStatusCode, &HeaderMap)> for Metadata {
             status: status.into(),
             headers: headermap
                 .into_iter()
-                .map(|(v, e)| (Some(v.as_str().to_string()), e.as_bytes().to_vec()))
+                .map(|(v, e)| {
+                    (
+                        Some(v.as_str().to_string()),
+                        String::from_utf8(e.as_bytes().to_vec()).map_err(|e| e.to_string()),
+                    )
+                })
                 .collect(),
         }
     }
