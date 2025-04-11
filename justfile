@@ -90,3 +90,11 @@ watch-full-stack:
   just dev-ui
   cd app && cargo tauri dev
   just inner-watch-server
+
+[group("hummus-js")]
+[positional-arguments]
+[working-directory: 'hummus-js']
+build-hummus-js *args="":
+  wasm-pack build --out-dir $1/ --out-name $1 --scope hummus $2 --no-typescript --no-pack -- ${@:3}
+  cp ./package.$1.json ./$1/package.json
+

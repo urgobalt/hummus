@@ -23,6 +23,7 @@
             systemfd
             nodejs
             parallel
+            wasm-pack
           ];
 
           nativeBuildInputs = with pkgs; [
