@@ -1,7 +1,6 @@
 #![allow(unused_imports)]
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
-use serde::Deserialize;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 #[allow(unused)]
 #[cfg(feature = "tauri")]
 #[derive(Serialize)]
@@ -63,17 +62,14 @@ pub type Tauri = WasmTauri;
 pub struct WasmTauri;
 #[cfg(all(feature = "tauri", target_arch = "wasm32"))]
 mod tauri_binding {
+    use reqwest::Method;
+    use tauri_wasm::{Data, invoke_with_args, is_tauri};
+
     use super::{
         JsonJsonRequest, JsonStatusRequest, StatusRequest, StringJsonRequest, StringStringRequest,
         WasmTauri,
     };
-    use crate::Error;
-    use crate::Metadata;
-    use crate::RequestBackend;
-    use crate::ResponseResult;
-    use reqwest::Method;
-    use tauri_wasm::Data;
-    use tauri_wasm::{invoke_with_args, is_tauri};
+    use crate::{Error, Metadata, RequestBackend, ResponseResult};
     impl RequestBackend for WasmTauri {
         async fn do_json_json_request<T: serde::Serialize, R: serde::de::DeserializeOwned>(
             url: &str,
@@ -156,12 +152,7 @@ mod tauri_binding {
             );
             let js_value = invoke_with_args(
                 "tauri_status_request",
-                Data(StatusRequest {
-                    url,
-                    method: method.as_str(),
-                    base_url,
-                    cookie,
-                }),
+                Data(StatusRequest { url, method: method.as_str(), base_url, cookie }),
             )
             .await?;
 
@@ -254,23 +245,22 @@ pub struct Axum;
 pub use tauri_backend::*;
 #[cfg(all(feature = "tauri", not(target_arch = "wasm32")))]
 mod tauri_backend {
-    use super::{
-        Axum, JsonJsonRequest, JsonStatusRequest, Metadata, StatusRequest, StringJsonRequest,
-        StringStringRequest,
-    };
-    use crate::Error;
-    use crate::JSON_CONTENT_TYPE;
-    use crate::RequestBackend;
+    use std::sync::{Mutex, OnceLock};
+
     use axum::Router;
     use axum::body::{Body, to_bytes};
     use axum::http::{Request, Response as AxumResponse};
     use reqwest::Method;
-    use reqwest::header::CONTENT_TYPE;
-    use reqwest::header::COOKIE;
-    use serde::{Serialize, de::DeserializeOwned};
-    use std::sync::Mutex;
-    use std::sync::OnceLock;
+    use reqwest::header::{CONTENT_TYPE, COOKIE};
+    use serde::Serialize;
+    use serde::de::DeserializeOwned;
     use tower_service::Service;
+
+    use super::{
+        Axum, JsonJsonRequest, JsonStatusRequest, Metadata, StatusRequest, StringJsonRequest,
+        StringStringRequest,
+    };
+    use crate::{Error, JSON_CONTENT_TYPE, RequestBackend};
     impl RequestBackend for Axum {
         async fn do_json_json_request<T: Serialize, R: DeserializeOwned>(
             url: &str,
@@ -357,10 +347,7 @@ mod tauri_backend {
             let status = resp.status();
             let body = resp.into_body();
             let data = to_bytes(body, 1_000_000).await?;
-            Ok((
-                Metadata::new(headers, status),
-                String::from_utf8_lossy(&data).to_string(),
-            ))
+            Ok((Metadata::new(headers, status), String::from_utf8_lossy(&data).to_string()))
         }
     }
     #[tauri_macros::command]
@@ -369,10 +356,7 @@ mod tauri_backend {
     ) -> Result<(Metadata, String), Error> {
         Axum::do_string_string_request::<true>(
             value.url,
-            value
-                .method
-                .parse()
-                .expect("This should only be created from Method"),
+            value.method.parse().expect("This should only be created from Method"),
             value.body,
             &value.base_url,
             &value.cookie,
@@ -386,10 +370,7 @@ mod tauri_backend {
     ) -> Result<(Metadata, String), Error> {
         Axum::do_string_string_request::<true>(
             value.url,
-            value
-                .method
-                .parse()
-                .expect("This should only be created from Method"),
+            value.method.parse().expect("This should only be created from Method"),
             value.body,
             &value.base_url,
             &value.cookie,
@@ -403,10 +384,7 @@ mod tauri_backend {
     ) -> Result<(Metadata, String), Error> {
         Axum::do_string_string_request::<false>(
             value.url,
-            value
-                .method
-                .parse()
-                .expect("This should only be created from Method"),
+            value.method.parse().expect("This should only be created from Method"),
             value.body,
             &value.base_url,
             &value.cookie,
@@ -420,10 +398,7 @@ mod tauri_backend {
     ) -> Result<Metadata, Error> {
         Axum::do_string_json_request::<true, ()>(
             value.url,
-            value
-                .method
-                .parse()
-                .expect("This should only be created from Method"),
+            value.method.parse().expect("This should only be created from Method"),
             value.body,
             &value.base_url,
             &value.cookie,
@@ -436,10 +411,7 @@ mod tauri_backend {
     pub async fn tauri_status_request<'a>(value: StatusRequest<'a>) -> Result<Metadata, Error> {
         Axum::do_status_request(
             value.url,
-            value
-                .method
-                .parse()
-                .expect("This should only be created from Method"),
+            value.method.parse().expect("This should only be created from Method"),
             &value.base_url,
             &value.cookie,
         )
@@ -452,10 +424,7 @@ mod tauri_backend {
     ) -> Result<(Metadata, String), Error> {
         Axum::do_string_string_request::<true>(
             value.url,
-            value
-                .method
-                .parse()
-                .expect("This should only be created from Method"),
+            value.method.parse().expect("This should only be created from Method"),
             value.body,
             value.base_url,
             value.cookie,
@@ -469,10 +438,7 @@ mod tauri_backend {
     ) -> Result<(Metadata, String), Error> {
         Axum::do_string_string_request::<false>(
             value.url,
-            value
-                .method
-                .parse()
-                .expect("This should only be created from Method"),
+            value.method.parse().expect("This should only be created from Method"),
             value.body,
             value.base_url,
             value.cookie,
@@ -486,9 +452,7 @@ mod tauri_backend {
     static SERVER: OnceLock<Mutex<Router<()>>> = OnceLock::new();
     /// remeber to call with_state with the correct ServerState lol
     pub fn init_with_axum_server(router: Router) {
-        SERVER
-            .set(Mutex::new(router))
-            .expect("Server not to be initalized before")
+        SERVER.set(Mutex::new(router)).expect("Server not to be initalized before")
     }
 
     async fn do_request_from_tauri<const JSON: bool>(

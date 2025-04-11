@@ -1,7 +1,7 @@
 use reqwest::Method;
 pub use response::*;
-
-use serde::{Serialize, de::DeserializeOwned};
+use serde::Serialize;
+use serde::de::DeserializeOwned;
 pub const JSON_CONTENT_TYPE: &str = "application/json";
 mod native;
 pub mod response;

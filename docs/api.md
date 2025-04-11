@@ -11,15 +11,15 @@ The api required for the store specification
 - /api/note PATCH # Update
 - /api/notes GET # gets all notes ids
 - /api/notes/search POST # search notes
-- /api/authenticate POST # validates the session and adds it as trusted for the duration given by the IDS
 
 ### Sharing
-Interactive notes are stored as a external url to the note
-static means that the note is copied in the current store
+#### **INTERACTIVE** Interactive notes are stored as a external url to the note
 - /api/share/interactive POST # gives sharing perms to a certain user given id
 - /api/share/interactive/note POST # shares access to a note
+#### **STATIC** static means that the note is copied in the current store
 - /api/share/static POST # shares access to a static copy by looking up the url of the store for the user to be shared Store
 - /api/share/static/note POST # shares access to a static copy by transfering the copy
+#### Accepting a shared note
 - /api/shared GET # gets all the notes that has been shared
 - /api/shared/accept POST # accepts a share is sent to both servers if they are interavtive
 - /api/shared/deny POST # decline one or many shared notes

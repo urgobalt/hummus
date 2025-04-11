@@ -1,5 +1,5 @@
-mod parser;
 mod generator;
+mod parser;
 use proc_macro::TokenStream;
 use syn::parse_macro_input;
 #[proc_macro]

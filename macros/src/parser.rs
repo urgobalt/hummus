@@ -1,9 +1,6 @@
-use syn::{
-    Ident, Path, Result, Type,
-    parse::{Parse, ParseStream},
-    punctuated::Punctuated,
-    token,
-};
+use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
+use syn::{Ident, Path, Result, Type, token};
 #[allow(unused)]
 pub struct Argument {
     pub name: Ident,
@@ -13,11 +10,7 @@ pub struct Argument {
 
 impl Parse for Argument {
     fn parse(input: ParseStream) -> Result<Self> {
-        Ok(Argument {
-            name: input.parse()?,
-            colon_token: input.parse()?,
-            ty: input.parse()?,
-        })
+        Ok(Argument { name: input.parse()?, colon_token: input.parse()?, ty: input.parse()? })
     }
 }
 

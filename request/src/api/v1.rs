@@ -1,1 +1,2 @@
-pub mod note;
+mod note;
+pub use note::*;

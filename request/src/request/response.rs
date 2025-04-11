@@ -1,18 +1,16 @@
-use crate::Error;
+use std::collections::HashMap;
+
 use reqwest::StatusCode as RequestStatusCode;
 use reqwest::header::HeaderMap;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+use crate::Error;
 pub type ResponseResult<T> = Result<Response<T>, Error>;
 
 #[derive(Serialize, Deserialize, Clone)]
-#[cfg_attr(
-    target_arch = "wasm32",
-    derive(tsify_next::Tsify),
-    tsify(into_wasm_abi, from_wasm_abi)
-)]
+#[cfg_attr(target_arch = "wasm32", derive(tsify_next::Tsify), tsify(into_wasm_abi, from_wasm_abi))]
 ///The response with a generic body
 pub struct Response<B> {
     metadata: Metadata,
@@ -20,41 +18,25 @@ pub struct Response<B> {
 }
 impl<B> Response<B> {
     pub fn map_body<U, F: FnOnce(B) -> U>(self, f: F) -> Response<U> {
-        Response {
-            metadata: self.metadata,
-            body: f(self.body),
-        }
+        Response { metadata: self.metadata, body: f(self.body) }
     }
     pub fn try_map_body<U, E, F: FnOnce(B) -> Result<U, E>>(self, f: F) -> Result<Response<U>, E> {
-        Ok(Response {
-            metadata: self.metadata,
-            body: f(self.body)?,
-        })
+        Ok(Response { metadata: self.metadata, body: f(self.body)? })
     }
 }
 impl<B, T: Into<Metadata>> From<(T, B)> for Response<B> {
     fn from((metadata, body): (T, B)) -> Self {
-        Self {
-            metadata: metadata.into(),
-            body,
-        }
+        Self { metadata: metadata.into(), body }
     }
 }
 impl<T: Into<Metadata>> From<T> for Response<()> {
     fn from(metadata: T) -> Self {
-        Self {
-            metadata: metadata.into(),
-            body: (),
-        }
+        Self { metadata: metadata.into(), body: () }
     }
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
-#[cfg_attr(
-    target_arch = "wasm32",
-    derive(tsify_next::Tsify),
-    tsify(into_wasm_abi, from_wasm_abi)
-)]
+#[cfg_attr(target_arch = "wasm32", derive(tsify_next::Tsify), tsify(into_wasm_abi, from_wasm_abi))]
 /// The statuscode of the result
 pub struct StatusCode(u16);
 impl From<RequestStatusCode> for StatusCode {
@@ -64,11 +46,7 @@ impl From<RequestStatusCode> for StatusCode {
 }
 /// A struct to cary the intermidiary of the metadata between the frontend and backend
 #[derive(Serialize, Deserialize, Clone)]
-#[cfg_attr(
-    target_arch = "wasm32",
-    derive(tsify_next::Tsify),
-    tsify(into_wasm_abi, from_wasm_abi)
-)]
+#[cfg_attr(target_arch = "wasm32", derive(tsify_next::Tsify), tsify(into_wasm_abi, from_wasm_abi))]
 /// The headers and statuscode of the response
 pub struct Metadata {
     status: StatusCode,

@@ -1,8 +1,9 @@
+use reqwest::header::{CONTENT_TYPE, COOKIE};
+use reqwest::{Client, Method};
+use serde::Serialize;
+use serde::de::DeserializeOwned;
+
 use super::{JSON_CONTENT_TYPE, RequestBackend, ResponseResult};
-use reqwest::Client;
-use reqwest::header::CONTENT_TYPE;
-use reqwest::{Method, header::COOKIE};
-use serde::{Serialize, de::DeserializeOwned};
 /// Using direct communication using [`reqwest`]
 pub struct Native;
 impl RequestBackend for Native {
@@ -30,9 +31,8 @@ impl RequestBackend for Native {
         base_url: &str,
         cookie: &str,
     ) -> ResponseResult<R> {
-        let mut resp = Client::new()
-            .request(method, format!("{base_url}/{url}"))
-            .header(COOKIE, cookie);
+        let mut resp =
+            Client::new().request(method, format!("{base_url}/{url}")).header(COOKIE, cookie);
         if JSON {
             resp = resp.header(CONTENT_TYPE, JSON_CONTENT_TYPE)
         }
@@ -77,9 +77,8 @@ impl RequestBackend for Native {
         base_url: &str,
         cookie: &str,
     ) -> ResponseResult<String> {
-        let mut resp = Client::new()
-            .request(method, format!("{base_url}/{url}"))
-            .header(COOKIE, cookie);
+        let mut resp =
+            Client::new().request(method, format!("{base_url}/{url}")).header(COOKIE, cookie);
         if JSON {
             resp = resp.header(CONTENT_TYPE, JSON_CONTENT_TYPE)
         }

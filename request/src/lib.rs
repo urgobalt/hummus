@@ -2,23 +2,11 @@
 pub mod api;
 pub mod definitions;
 mod error;
+mod prelude;
 mod request;
 pub use error::Error;
 pub use request::*;
 use serde::{Deserialize, Serialize};
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
-#[derive(Serialize, PartialEq, Deserialize, Clone)]
-#[cfg_attr(
-    target_arch = "wasm32",
-    derive(tsify_next::Tsify),
-    tsify(into_wasm_abi, from_wasm_abi)
-)]
-pub struct Session {
-    cookie: String,
-    store_url: String,
-    ids: String,
-}
 
 #[derive(Serialize, PartialEq, Deserialize, Clone)]
 pub struct ServerState {}

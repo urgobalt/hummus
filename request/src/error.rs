@@ -1,9 +1,8 @@
-use serde::Serialize;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 #[cfg_attr(
     target_arch = "wasm32",
-    derive(tsify_next::Tsify, Serialize),
+    derive(tsify_next::Tsify, serde::Serialize),
     tsify(into_wasm_abi),
     tsify(namespace)
 )]
